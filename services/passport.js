@@ -46,7 +46,7 @@ passport.use('login', new localStrategy({
     callbackURL: "http://localhost:3000/api/v1/auth/google/callback",
     passReqToCallback   : true
   },
-  function(request, accessToken, refreshToken, profile, done) {
+  async function(request, accessToken, refreshToken, profile, done) {
     UserModel.findOne({ email: profile.email }, function (err, user) {
       return done(err, user);
     });
