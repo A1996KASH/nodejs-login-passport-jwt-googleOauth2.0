@@ -1,13 +1,12 @@
 const express = require('express')
 const dotenv = require('dotenv')
-// const morgan = require('morgan')
 const errorHandler = require('../middleware/error')
 const mongoSanitize = require('express-mongo-sanitize')
+const morgan = require('morgan')
 const helmet = require('helmet')
 const xss = require('xss-clean')
 const cors = require('cors')
 const hpp = require('hpp')
-// const webpush = require('web-push')
 const fileUpload = require('express-fileupload')
 const rateLimit = require('express-rate-limit')
 const path = require('path')
@@ -15,8 +14,7 @@ const path = require('path')
 dotenv.config({ debug: process.env.DEBUG })
 // Import DB
 const connectDB = require('../config/db')
-// Import monthly summary message sender
-// const { sendSummary } = require('../utils/accountSummary')
+
 
 // route files
 const users = require('../api/users/')
@@ -26,14 +24,8 @@ const auth = require('../api/auth/')
 if (process.env.NODE_ENV !== 'test') {
   connectDB()
 }
-// send Summary
-// sendSummary()
 
 const app = express()
-
-if (process.env.doCron === 'CRONSTART') {
-
-}
 
 // Body Parser
 app.use(express.json())
@@ -57,10 +49,6 @@ app.use(limiter)
 // hpp
 app.use(hpp())
 
-// app.use(function (req, res, next) {
-//   res.setHeader('content-security-policy-report-only', "default-src 'self'; script-src 'self' 'report-sample'; style-src 'self' 'report-sample'; base-uri 'none'; object-src 'none'; report-uri https://5e52f4c893efcda6a7d40460.endpoint.csper.io")
-//   next()
-// })
 
 if (process.env.NODE_ENV === 'development') {
   const corsOptions = {
@@ -81,14 +69,11 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 if (process.env.NODE_ENV === 'development') {
-  //  app.use(morgan(':remote-addr - :remote-user [:date[clf]] ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent"'))
+   app.use(morgan(':remote-addr - :remote-user [:date[clf]] ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent"'))
 }
-// app.use(systemLogger())
+
 // file Upload
 app.use(fileUpload())
-
-// push notifications
-// webpush.setVapidDetails('mailto:akshay.sharma@zeblok.com', process.env.publicVapidKey, process.env.privateVapidKey)
 
 // set static folder
 var options = {
@@ -105,13 +90,7 @@ app.use(express.static(path.join(__dirname, '../public'), options))
 app.use(express.static(path.join(__dirname, '../public/client'), options))
 
 // Use Routes
-// All other routes should redirect to the index.html
 app.use('/api/v1/auth', auth)
-// app.use('/api/v1/users', users)
-
-// app.use('/api/v1/notifications', pushNotification)
-// app.use('/api/v1/notificationpayload', notificationPayload)
-
 // All other routes should redirect to the index.html
 app.route('/*')
   .get((req, res) => {
